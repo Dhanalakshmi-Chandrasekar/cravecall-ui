@@ -1,4 +1,4 @@
-const API_BASE = "cravecallcateringbk-hrgjcyd3aeaxc3dz.canadacentral-01.azurewebsites.net";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export type BrandingDTO = {
   app_name?: string;
@@ -78,4 +78,5 @@ export async function uploadBrandLogo(file: File): Promise<{ logo_url: string }>
   if (!res.ok) throw new Error(await res.text() || "Logo upload failed");
   return await res.json();
 }
+
 
