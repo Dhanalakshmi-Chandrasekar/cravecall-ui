@@ -1,4 +1,4 @@
-const API_BASE = "cravecallcateringbk-hrgjcyd3aeaxc3dz.canadacentral-01.azurewebsites.net";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export type DashboardSummary = {
   day: string;
@@ -18,4 +18,5 @@ export async function fetchDashboardSummary(day?: string) {
   if (!res.ok) throw new Error("Failed to fetch dashboard summary");
   return (await res.json()) as DashboardSummary;
 }
+
 
