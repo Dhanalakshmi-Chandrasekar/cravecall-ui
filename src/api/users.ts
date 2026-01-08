@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:9002";
+const API_BASE = "cravecallcateringbk-hrgjcyd3aeaxc3dz.canadacentral-01.azurewebsites.net";
 
 export type UserMeDTO = {
   user_id: string;
