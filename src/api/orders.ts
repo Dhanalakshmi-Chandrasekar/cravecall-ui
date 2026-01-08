@@ -8,7 +8,7 @@
 
 
 // src/api/orders.ts
-const API_BASE = "cravecallcateringbk-hrgjcyd3aeaxc3dz.canadacentral-01.azurewebsites.net";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 /**
  * IMPORTANT:
@@ -36,4 +36,5 @@ export async function updateOrderStatus(orderId: string, status: string) {
   if (!res.ok) throw new Error("Failed to update status");
   return await res.json();
 }
+
 
