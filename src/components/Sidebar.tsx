@@ -1,5 +1,13 @@
-import { LayoutDashboard, ShoppingBag, DollarSign, Users, Settings } from "lucide-react";
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  DollarSign,
+  Users,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { Page } from "../types";
+import { useAuth } from "../context/AuthContext";
 
 type Branding = {
   app_name?: string;
@@ -10,10 +18,18 @@ type Branding = {
 interface SidebarProps {
   currentPage: Page;
   onNavigate: (page: Page) => void;
-  branding?: Branding; // ✅ new
+  branding?: Branding;
+  user?: { name?: string; email?: string } | null;
 }
 
-export default function Sidebar({ currentPage, onNavigate, branding }: SidebarProps) {
+export default function Sidebar({
+  currentPage,
+  onNavigate,
+  branding,
+  user, // ✅ IMPORTANT: take user from props
+}: SidebarProps) {
+  const { signOut } = useAuth();
+
   const menuItems = [
     { id: "dashboard" as Page, label: "Dashboard", icon: LayoutDashboard },
     { id: "orders" as Page, label: "Orders", icon: ShoppingBag },
@@ -28,6 +44,7 @@ export default function Sidebar({ currentPage, onNavigate, branding }: SidebarPr
 
   return (
     <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
+      {/* Branding */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-2">
           {logoUrl ? (
@@ -36,7 +53,6 @@ export default function Sidebar({ currentPage, onNavigate, branding }: SidebarPr
               alt="Logo"
               className="w-10 h-10 rounded-lg object-cover border border-gray-200"
               onError={(e) => {
-                // fallback if image fails
                 (e.currentTarget as HTMLImageElement).style.display = "none";
               }}
             />
@@ -47,12 +63,15 @@ export default function Sidebar({ currentPage, onNavigate, branding }: SidebarPr
           )}
 
           <div className="min-w-0">
-            <h1 className="text-xl font-bold text-gray-900 truncate">{appName}</h1>
+            <h1 className="text-xl font-bold text-gray-900 truncate">
+              {appName}
+            </h1>
             <p className="text-xs text-gray-500 truncate">{tagline}</p>
           </div>
         </div>
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
           {menuItems.map((item) => {
@@ -64,7 +83,9 @@ export default function Sidebar({ currentPage, onNavigate, branding }: SidebarPr
                 <button
                   onClick={() => onNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive ? "bg-orange-50 text-orange-600" : "text-gray-600 hover:bg-gray-50"
+                    isActive
+                      ? "bg-orange-50 text-orange-600"
+                      : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -76,14 +97,35 @@ export default function Sidebar({ currentPage, onNavigate, branding }: SidebarPr
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-gray-200">
-        <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4">
-          <p className="text-sm font-semibold text-gray-900 mb-1">Need Help?</p>
-          <p className="text-xs text-gray-600 mb-3">Contact support for assistance</p>
-          <button className="w-full bg-white text-orange-600 text-sm font-medium py-2 rounded-md hover:bg-gray-50 transition-colors">
-            Get Support
-          </button>
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-200 space-y-3">
+        {/* Support Card */}
+        
+
+        {/* ✅ Logged-in User Info (BOTTOM) */}
+        <div className="rounded-lg border border-gray-200 p-3 bg-gray-50">
+          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">
+          </p>
+          <p className="text-sm font-semibold text-gray-900 truncate">
+            {user?.name || "Unknown User"}
+          </p>
+          <p className="text-xs text-gray-600 truncate">
+            {user?.email || ""}
+          </p>
         </div>
+
+        {/* ✅ Logout */}
+        <button
+          onClick={() => {
+            if (confirm("Are you sure you want to logout?")) {
+              signOut();
+            }
+          }}
+          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-red-600 border border-red-200 rounded-lg py-2 hover:bg-red-50 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </button>
       </div>
     </div>
   );

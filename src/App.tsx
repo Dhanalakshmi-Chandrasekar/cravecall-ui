@@ -8,11 +8,21 @@ import Customers from "./components/Customers";
 import Settings from "./components/Settings";
 import { getSettings, SettingsDTO } from "./api/settings";
 
-function App() {
+import Login from "./pages/Login";      // <- adjust path if different
+import Register from "./pages/Register"; // <- adjust path if different
+import { useAuth } from "./context/AuthContext"; // <- your AuthContext
+
+export default function App() {
+  const { user, token, loading } = useAuth();
+  const [showRegister, setShowRegister] = useState(false);
+
   const [currentPage, setCurrentPage] = useState<Page>("dashboard");
   const [settings, setSettings] = useState<SettingsDTO | null>(null);
 
+  // ✅ ONLY fetch settings after login (prevents crashes in components expecting auth)
   useEffect(() => {
+    if (!token) return;
+
     (async () => {
       try {
         const s = await getSettings();
@@ -21,7 +31,25 @@ function App() {
         // ignore
       }
     })();
-  }, []);
+  }, [token]);
+
+  // ✅ Loading screen while restoring auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-600">
+        Loading...
+      </div>
+    );
+  }
+
+  // ✅ If not logged in, show auth pages
+  if (!token || !user) {
+    return showRegister ? (
+      <Register onToggleLogin={() => setShowRegister(false)} />
+    ) : (
+      <Login onToggleRegister={() => setShowRegister(true)} />
+    );
+  }
 
   const renderPage = () => {
     switch (currentPage) {
@@ -34,7 +62,6 @@ function App() {
       case "customers":
         return <Customers />;
       case "settings":
-        // optional: after saving settings, you can refresh sidebar branding
         return <Settings />;
       default:
         return <Dashboard />;
@@ -47,10 +74,10 @@ function App() {
         currentPage={currentPage}
         onNavigate={setCurrentPage}
         branding={settings?.branding}
+        user={user} 
+
       />
       <div className="flex-1 overflow-y-auto">{renderPage()}</div>
     </div>
   );
 }
-
-export default App;
